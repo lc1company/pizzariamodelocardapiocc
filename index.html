@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cardápio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <style>
+        /* Estilos CSS personalizados */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .categoria {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .produtos-container {
+            white-space: nowrap;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .produto {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 20px;
+            background-color: #555;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .produto img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        .botoes {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 5px;
+            margin-right: 10px;
+        }
+        .remover {
+            background-color: red;
+        }
+        .adicionais-container {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .adicionais-container.show {
+            display: block;
+        }
+        .adicionais-container button {
+            background-color: hsl(93, 100%, 28%);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .adicionais-container button.remover {
+            background-color: red;
+        }
+        .adicionais-item {
+            display: inline-block;
+            margin: 5px;
+            background-color: #333;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+        .carrinho-container {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        .carrinho {
+            display: none;
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .carrinho.show {
+            display: block;
+        }
+        .cliente-info {
+            margin-bottom: 10px;
+        }
+        .cliente-info label {
+            font-weight: bold;
+            display: block;
+        }
+        .pedido-item {
+            margin-top: 10px;
+        }
+        .pedido-item:last-child {
+            margin-bottom: 10px;
+        }
+        .pedido-item h3 {
+            margin: 0;
+        }
+        .pedido-item p {
+            margin: 0;
+        }
+        .pedido-total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .frete {
+            margin-top: 10px;
+        }
+        .tutorial {
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+        .notificacao {
+            display: none;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            animation: slide 2s ease-in-out;
+        }
+        @keyframes slide {
+            0% {
+                top: -50px;
+            }
+            100% {
+                top: 0;
+            }
+        }
+        .confirmacao {
+            display: none;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .confirmacao.show {
+            display: block;
+        }
+        .confirmacao h3 {
+            font-size: 1.2em;
+            margin: 0 0 20px 0;
+        }
+        .confirmacao button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .confirmacao button.cancelar {
+            background-color: red;
+        }
+    </style>
+</head>
+<body onload="limparCampos()">
+    <div class="container">
+        <h1>Cardápio</h1>
+        
+        <!-- Categoria: Pizzas -->
+        <div class="categoria">Pizzas:</div>
+        <div class="produtos-container">
+            <!-- Produtos de Pizza aqui -->
+            <div class="produto">
+                <img src="pizza.png" alt="Pizza de Mussarela">
+                <p>Pizza de Mussarela</p>
+                <p>R$ 30,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Pizza de Mussarela', 30)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Pizza de Mussarela', 30)">Remover</button>
+                    <button class="adicionais" onclick="mostrarAdicionais(this)">Adicionais</button>
+                </div>
+                <div class="adicionais-container">
+                    <p>Adicionais:</p>
+                    <button onclick="adicionarAdicional('Pizza de Mussarela', 'Borda Recheada', 2.50)">Borda Recheada +R$ 2,50</button>
+                    <button onclick="adicionarAdicional('Pizza de Mussarela', 'Extra Bacon', 5)">Extra Bacon +R$ 5,00</button>
+                    <button onclick="adicionarAdicional('Pizza de Mussarela', 'Cogumelos', 3)">Cogumelos +R$ 3,00</button>
+                </div>
+            </div>
+            <!-- Adicione mais produtos de pizza aqui -->
+            <div class="produto">
+                <img src="pizza.png" alt="Pizza de Calabresa">
+                <p>Pizza de Calabresa</p>
+                <p>R$ 28,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Pizza de Calabresa', 28)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Pizza de Calabresa', 28)">Remover</button>
+                    <button class="adicionais" onclick="mostrarAdicionais(this)">Adicionais</button>
+                </div>
+                <div class="adicionais-container">
+                    <p>Adicionais:</p>
+                    <button onclick="adicionarAdicional('Pizza de Calabresa', 'Borda Recheada', 2.50)">Borda Recheada +R$ 2,50</button>
+                    <button onclick="adicionarAdicional('Pizza de Calabresa', 'Extra Bacon', 5)">Extra Bacon +R$ 5,00</button>
+                    <button onclick="adicionarAdicional('Pizza de Calabresa', 'Cogumelos', 3)">Cogumelos +R$ 3,00</button>
+                </div>
+            </div>
+            <div class="produto">
+                <img src="pizza.png" alt="Pizza de Frango com Catupiry">
+                <p>Pizza de Frango com Catupiry</p>
+                <p>R$ 32,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Pizza de Frango com Catupiry', 32)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Pizza de Frango com Catupiry', 32)">Remover</button>
+                    <button class="adicionais" onclick="mostrarAdicionais(this)">Adicionais</button>
+                </div>
+                <div class="adicionais-container">
+                    <p>Adicionais:</p>
+                    <button onclick="adicionarAdicional('Pizza de Frango com Catupiry', 'Borda Recheada', 2.50)">Borda Recheada +R$ 2,50</button>
+                    <button onclick="adicionarAdicional('Pizza de Frango com Catupiry', 'Extra Bacon', 5)">Extra Bacon +R$ 5,00</button>
+                    <button onclick="adicionarAdicional('Pizza de Frango com Catupiry', 'Cogumelos', 3)">Cogumelos +R$ 3,00</button>
+                </div>
+            </div>
+            <div class="produto">
+                <img src="pizza.png" alt="Pizza de Vegetariana">
+                <p>Pizza de Vegetariana</p>
+                <p>R$ 29,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Pizza de Vegetariana', 29)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Pizza de Vegetariana', 29)">Remover</button>
+                    <button class="adicionais" onclick="mostrarAdicionais(this)">Adicionais</button>
+                </div>
+                <div class="adicionais-container">
+                    <p>Adicionais:</p>
+                    <button onclick="adicionarAdicional('Pizza de Vegetariana', 'Borda Recheada', 2.50)">Borda Recheada +R$ 2,50</button>
+                    <button onclick="adicionarAdicional('Pizza de Vegetariana', 'Extra Bacon', 5)">Extra Bacon +R$ 5,00</button>
+                    <button onclick="adicionarAdicional('Pizza de Vegetariana', 'Cogumelos', 3)">Cogumelos +R$ 3,00</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categoria: Bebidas -->
+        <div class="categoria">Bebidas:</div>
+        <div class="produtos-container">
+            <!-- Produtos de Bebidas aqui -->
+            <div class="produto">
+                <img src="CocaColaLata.png" alt="Coca-Cola Lata 350 ml">
+                <p>Coca-Cola Lata 350 ml</p>
+                <p>R$ 5,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Coca-Cola Lata 350 ml', 5)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Refrigerante', 5)">Remover</button>
+                </div>
+            </div>
+            <!-- Adicione mais produtos de bebida aqui -->
+            <div class="produto">
+                <img src="Agua.png" alt="Água Mineral">
+                <p>Água Mineral</p>
+                <p>R$ 3,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Água Mineral', 3)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Água Mineral', 3)">Remover</button>
+                </div>
+            </div>
+            <div class="produto">
+                <img src="pepsiLata.png" alt="Pepsi lata 350 ml">
+                <p>Pepsi Lata 350 ml</p>
+                <p>R$ 6,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('Pepsi Lata 350 ml', 6)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('Pepsi Lata 350 ml', 6)">Remover</button>
+                </div>
+            </div>
+            <div class="produto">
+                <img src="Fanta.png" alt="fanta lata 350 ml">
+                <p>Fanta lata 350 ml</p>
+                <p>R$ 7,00</p>
+                <div class="botoes">
+                    <button onclick="adicionarItem('fanta lata 350 ml', 7)">Adicionar</button>
+                    <button class="remover" onclick="removerItem('fanta lata 350 ml', 7)">Remover</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrinho -->
+    <div class="carrinho-container">
+        <button onclick="toggleCarrinho()">Seu Carrinho <span id="numItensCarrinho">0</span></button>
+        <div class="carrinho">
+            <h2>Seu Carrinho</h2>
+            <div class="cliente-info">
+                <label for="nomeCliente">Nome do Cliente:</label>
+                <input type="text" id="nomeCliente">
+                <label for="endereco">Endereço de Entrega:</label>
+                <input type="text" id="endereco">
+                <label>Método de Pagamento:</label>
+                <select id="metodoPagamento">
+                    <option value="Cartão">Cartão de Crédito</option>
+                    <option value="Debito">Cartão de Débito</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+                <label for="notasPedido">Notas do Pedido:</label>
+                <input type="text" id="notasPedido" placeholder="Exemplo Sem cebola">
+                <label for="troco">Troco para:</label>
+                <input type="number" id="troco" step="0.01" placeholder="Troco em R$">
+            </div>
+            <div id="pedidoItens">
+                <!-- Itens do Pedido aqui -->
+            </div>
+            <p class="pedido-total">Total: R$ <span id="totalPedido">0.00</span></p>
+            <p class="frete">Taxa de Entrega: R$ 5.00</p>
+            <button onclick="confirmarPedido()">Finalizar Pedido</button>
+            <p class="tutorial">Dica: Aperte duas vezes o botão de Adicionar Para adicionar o mesmo produto duas vezes.</p>
+        </div>
+    </div>
+    
+    <!-- Notificação -->
+    <div id="notificacao" class="notificacao"></div>
+
+    <!-- Confirmação de Pedido -->
+    <div id="confirmacaoPedido" class="confirmacao">
+        <h3>Confirmação de Pedido</h3>
+        <p>Nome do Pedido: <span id="nomePedido"></span></p>
+        <p>Itens do Pedido:</p>
+        <div id="itensPedido"></div>
+        <p>Total: R$ <span id="valorTotalPedido"></span></p>
+        <button onclick="finalizarPedidoWhatsApp()">Sim</button>
+        <button class="cancelar" onclick="cancelarPedido()">Não</button>
+    </div>
+</body>
+</html>
+
+<script>
+    // Lógica do carrinho aqui
+    let totalPedido = 0;
+    const pedidoItens = [];
+    const numeroPedido = Math.floor(Math.random() * 5000);
+
+    function limparCampos() {
+        document.getElementById("nomeCliente").value = "";
+        document.getElementById("endereco").value = "";
+        document.getElementById("metodoPagamento").value = "Cartão";
+        document.getElementById("notasPedido").value = "";
+        document.getElementById("troco").value = "";
+    }
+
+    function adicionarItem(itemNome, itemValor) {
+        totalPedido += itemValor;
+        pedidoItens.push(`${itemNome} (R$ ${itemValor.toFixed(2)})`);
+        atualizarPedido();
+        mostrarNotificacao(`${itemNome} foi adicionado ao carrinho.`);
+    }
+
+    function removerItem(itemNome, itemValor) {
+        const index = pedidoItens.indexOf(`${itemNome} (R$ ${itemValor.toFixed(2)})`);
+        if (index > -1) {
+            pedidoItens.splice(index, 1);
+            totalPedido -= itemValor;
+        }
+        atualizarPedido();
+    }
+
+    function adicionarAdicional(pizzaNome, adicionalNome, adicionalValor) {
+        totalPedido += adicionalValor;
+        pedidoItens.push(`Adicional para ${pizzaNome}: ${adicionalNome} (R$ ${adicionalValor.toFixed(2)})`);
+        atualizarPedido();
+    }
+
+    function mostrarAdicionais(button) {
+        const container = button.parentElement.nextElementSibling;
+        container.classList.toggle("show");
+    }
+
+    function atualizarPedido() {
+        const pedidoTexto = pedidoItens.join('<br>');
+        document.getElementById("pedidoItens").innerHTML = `<div class="pedido-item">${pedidoTexto}</div>`;
+        document.getElementById("totalPedido").textContent = (totalPedido + 5.00).toFixed(2); // Adiciona a taxa de entrega ao total
+        document.getElementById("numItensCarrinho").textContent = pedidoItens.length;
+    }
+
+    function toggleCarrinho() {
+        const carrinho = document.querySelector('.carrinho');
+        carrinho.classList.toggle("show");
+    }
+
+    function confirmarPedido() {
+        const nomePedido = `Pedido #${numeroPedido}`;
+        const valorTotalPedido = `R$ ${(totalPedido + 5.00).toFixed(2)}`;
+        const itensPedido = pedidoItens.join('<br>');
+
+        document.getElementById("nomePedido").textContent = nomePedido;
+        document.getElementById("valorTotalPedido").textContent = valorTotalPedido;
+        document.getElementById("itensPedido").innerHTML = `<div class="pedido-item">${itensPedido}</div>`;
+
+        const confirmacaoPedido = document.getElementById("confirmacaoPedido");
+        confirmacaoPedido.classList.add("show");
+    }
+
+    function finalizarPedidoWhatsApp() {
+        const mensagemPedido = `Pedido #${numeroPedido}\nNome: ${document.getElementById("nomeCliente").value}\nEndereço: ${document.getElementById("endereco").value}\nMétodo de Pagamento: ${document.getElementById("metodoPagamento").value}\nNotas do Pedido: ${document.getElementById("notasPedido").value}\nTroco para: R$ ${document.getElementById("troco").value}\n\nItens do Pedido:\n${pedidoItens.join('\n')}\n\nTotal: R$ ${(totalPedido + 5.00).toFixed(2)}\nTaxa de Entrega: R$ 5.00`; // Adiciona a taxa de entrega à mensagem
+
+        // Substitua o número de telefone abaixo pelo seu número do WhatsApp
+        const numeroWhatsApp = '19996564968';
+        const linkWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(mensagemPedido)}`;
+
+        window.open(linkWhatsApp);
+
+        // Limpa os campos após finalizar o pedido
+        limparCampos();
+
+        // Limpa o carrinho
+        totalPedido = 0;
+        pedidoItens.length = 0;
+        atualizarPedido();
+
+        // Fecha a confirmação de pedido
+        const confirmacaoPedido = document.getElementById("confirmacaoPedido");
+        confirmacaoPedido.classList.remove("show");
+    }
+
+    function cancelarPedido() {
+        // Fecha a confirmação de pedido
+        const confirmacaoPedido = document.getElementById("confirmacaoPedido");
+        confirmacaoPedido.classList.remove("show");
+    }
+
+    function mostrarNotificacao(mensagem) {
+        const notificacao = document.getElementById("notificacao");
+        notificacao.textContent = mensagem;
+        notificacao.style.display = "block";
+        setTimeout(() => {
+            notificacao.style.display = "none";
+        }, 2000);
+    }
+</script>
+</body>
+</html>
+
